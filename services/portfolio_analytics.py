@@ -19,6 +19,8 @@ class RiskDiagnostic(BaseModel):
     beta_sensitivity: float
     rate_sensitivity: str
     sector_concentration_risk: str
+    diversification_score: float
+    top_sector_weight: float
 
 class MajorHolding(BaseModel):
     name: str
@@ -33,6 +35,7 @@ class PortfolioAnalysis(BaseModel):
     risk_diagnostics: RiskDiagnostic
     stress_tests: List[StressTest]
     major_holdings: List[MajorHolding]
+    total_current_value: float
 
 def get_current_nav(mf: MutualFundHolding) -> float:
     nav = mf.current_nav if mf.current_nav is not None else mf.current_price
@@ -128,13 +131,18 @@ def build_portfolio_analysis(portfolio: Portfolio, data_loader: DataLoader) -> P
     effective_exposure = compute_effective_sector_exposure(portfolio, data_loader)
     hhi = calculate_hhi(effective_exposure)
     
+    top_sector_weight = max(effective_exposure.values()) if effective_exposure else 0.0
+    div_score = round(max(0, 100 - (hhi / 100)), 2)
+    
     risk_diagnostics = RiskDiagnostic(
         hhi=hhi,
         hhi_status="CONCENTRATED" if hhi > 2500 else "MODERATE" if hhi > 1500 else "DIVERSIFIED",
         overlap_risk="HIGH" if any(v > 40 for v in effective_exposure.values()) else "LOW",
         beta_sensitivity=1.12 if hhi > 2000 else 0.95,
         rate_sensitivity="HIGH" if effective_exposure.get("BANKING", 0) > 30 else "MODERATE",
-        sector_concentration_risk=f"{max(effective_exposure.values()) if effective_exposure else 0}% in Top Sector"
+        sector_concentration_risk=f"{top_sector_weight}% in Top Sector",
+        diversification_score=div_score,
+        top_sector_weight=top_sector_weight
     )
 
     major_holdings = []
@@ -151,5 +159,6 @@ def build_portfolio_analysis(portfolio: Portfolio, data_loader: DataLoader) -> P
         effective_sector_exposure=effective_exposure,
         risk_diagnostics=risk_diagnostics,
         stress_tests=run_stress_tests(effective_exposure),
-        major_holdings=major_holdings[:5]
+        major_holdings=major_holdings[:5],
+        total_current_value=total_val
     )
