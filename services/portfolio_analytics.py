@@ -134,7 +134,6 @@ def compute_look_through_details(portfolio: Portfolio, data_loader: DataLoader) 
     return look_through
 
 def calculate_hhi(effective_exposure: Dict[str, float]) -> float:
-    # HHI = sum of squared market shares
     total = sum(effective_exposure.values())
     if total == 0: return 0
     hhi = sum(((val / total) * 100)**2 for val in effective_exposure.values())
@@ -142,7 +141,6 @@ def calculate_hhi(effective_exposure: Dict[str, float]) -> float:
 
 def run_stress_tests(effective_exposure: Dict[str, float]) -> List[StressTest]:
     scenarios = []
-    # Banking Correction
     banking_exp = effective_exposure.get("BANKING", 0)
     scenarios.append(StressTest(
         scenario="Banking Sector -10% Correction",
@@ -150,15 +148,14 @@ def run_stress_tests(effective_exposure: Dict[str, float]) -> List[StressTest]:
         vulnerable_holdings=["HDFCBANK", "ICICIBANK", "SBIN"],
         drawdown_estimate=f"Est. {banking_exp * 0.1:.1f}% portfolio drag"
     ))
-    # Crude Oil Spike
     energy_exp = effective_exposure.get("ENERGY", 0)
     scenarios.append(StressTest(
         scenario="Crude Oil Price Spike ($100/bbl)",
-        impact_percent=round(energy_exp * 0.05 - 2.0, 2), # Negative net impact usually
+        impact_percent=round(energy_exp * 0.05 - 2.0, 2), 
         vulnerable_holdings=["RELIANCE", "BPCL", "ONGC"],
         drawdown_estimate="Supply chain cost escalation risk"
     ))
-    # FII Outflow
+
     scenarios.append(StressTest(
         scenario="FII Mass Outflow Event",
         impact_percent=-4.5,
