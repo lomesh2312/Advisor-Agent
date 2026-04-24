@@ -50,6 +50,7 @@ class AdvisorReport(BaseModel):
     sector_intelligence_view: List[SectorIntelligence] = []
     final_diagnosis: str = "N/A"
     confidence_level: str = "MEDIUM"
+    latency_ms: float = 0.0
 
 ADVISOR_SYSTEM_PROMPT = """You are a Senior Portfolio Strategist / CIO. Generate an institutional-grade risk and intelligence report.
 TONE: Concise, analytical, high-signal. Resemble a premium wealth management diagnostic.
@@ -87,6 +88,9 @@ def generate_advisor_report(market_context: Dict[str, Any], portfolio_analysis: 
         if "news" in market_context:
             market_context["news"] = [n.dict() if hasattr(n, "dict") else n for n in market_context["news"]]
 
+        import time
+        start_time = time.time()
+        
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
@@ -97,12 +101,15 @@ def generate_advisor_report(market_context: Dict[str, Any], portfolio_analysis: 
             temperature=0.1
         )
         
+        latency = (time.time() - start_time) * 1000
         data = json.loads(completion.choices[0].message.content)
         
         # Robustness: Sync some fields from analysis if missing/hallucinated
         data["portfolio_id"] = portfolio_id
         data["effective_sector_exposure"] = portfolio_analysis.get("effective_sector_exposure", {})
         data["market_sentiment"] = data.get("market_sentiment") or market_context.get("market_sentiment", "NEUTRAL")
+        
+        data["latency_ms"] = round(latency, 2)
         
         safe_flush()
         return AdvisorReport(**data)
@@ -115,5 +122,6 @@ def generate_advisor_report(market_context: Dict[str, Any], portfolio_analysis: 
             executive_summary=f"Analysis engine experienced a transient error. Manual look-through suggests concentration in {portfolio_analysis.get('top_sector', 'equity')}.",
             effective_sector_exposure=portfolio_analysis.get("effective_sector_exposure", {}),
             market_sentiment="NEUTRAL",
-            final_diagnosis="Maintain defensive posture while system recalibrates."
+            final_diagnosis="Maintain defensive posture while system recalibrates.",
+            latency_ms=0.0
         )
