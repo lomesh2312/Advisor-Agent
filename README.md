@@ -1,190 +1,817 @@
-# Financial Advisor Agent - Mock Dataset
+# Autonomous Financial Advisor Agent
 
-This directory contains comprehensive mock data for the Autonomous Financial Advisor Agent challenge.
+## Overview
 
-## Dataset Overview
+**Autonomous Financial Advisor Agent** is an AI-powered multi-agent portfolio intelligence system that combines:
 
-| File | Description | Key Data Points |
-|------|-------------|-----------------|
-| `market_data.json` | Real-time market data snapshot | 40+ stocks, 5 indices, 10 sectors |
-| `news_data.json` | Financial news feed | 25 articles with sentiment, scope, and entity tags |
-| `portfolios.json` | User portfolio samples | 3 portfolios (Diversified, Sector-heavy, Conservative) |
-| `mutual_funds.json` | Mutual fund details | 12 schemes with NAV, holdings, and returns |
-| `historical_data.json` | 7-day historical trends | Index/stock history, FII/DII data, market breadth |
-| `sector_mapping.json` | Sector-stock relationships | Macro correlations and sector characteristics |
+* Quantitative portfolio analytics
+* Causal financial reasoning using LLMs
+* Stress testing and risk diagnostics
+* Institutional-style investment recommendations
+* Independent reasoning evaluation/audit layer
+* Interactive Streamlit intelligence dashboard
+* FastAPI backend for API-driven deployment
+* Observability with Langfuse tracing
 
-## Data Scenarios Included
+Rather than acting as a simple chatbot or rule-based investment tool, this project behaves like an **autonomous portfolio research copilot**, generating **CIO-style diagnostic reports** using structured portfolio data, market signals, news catalysts, and LLM reasoning.
 
-### Market Conditions (April 21, 2026)
+---
 
-The dataset simulates a **risk-off market day** with the following characteristics:
+# Architecture
 
-- **NIFTY 50**: -1.00% (Bearish)
-- **Bank Nifty**: -2.33% (Strong selling due to RBI stance)
-- **NIFTY IT**: +1.22% (Outperforming due to US tech earnings)
-- **FII**: Net sellers of ₹4,500 crore
-- **Market Breadth**: Weak (12 advances vs 38 declines in NIFTY 50)
+## System Architecture
 
-### Sector Performance
+```text
+                    ┌─────────────────────────┐
+                    │  Streamlit Frontend UI  │
+                    └──────────┬──────────────┘
+                               │
+                               ▼
+                    ┌─────────────────────────┐
+                    │      FastAPI Backend    │
+                    └──────────┬──────────────┘
+                               │
+      ┌────────────────────────┼────────────────────────┐
+      ▼                        ▼                        ▼
+┌──────────────┐       ┌───────────────┐       ┌────────────────┐
+│ Data Loader  │       │Portfolio Engine│      │ Reasoning Engine│
+│JSON Datasets │       │ Risk Analytics │      │ Groq LLM Agent  │
+└──────┬───────┘       └──────┬────────┘       └────────┬───────┘
+       │                      │                         │
+       ▼                      ▼                         ▼
+ Portfolio Data      Stress Tests / Exposure      Advisor Report
+ Market Data         Concentration Metrics        Causal Chains
+ News Data           Look-through Analysis        Rebalancing Actions
+       │                                              │
+       └──────────────────────┬───────────────────────┘
+                              ▼
+                     ┌─────────────────┐
+                     │ Audit Evaluator │
+                     │  Report Scoring │
+                     └─────────────────┘
+```
 
-| Sector | Day Change | Sentiment | Key Driver |
-|--------|------------|-----------|------------|
-| Banking | -2.45% | Bearish | RBI hawkish stance |
-| IT | +1.35% | Bullish | US tech earnings, weak rupee |
-| Pharma | +0.78% | Bullish | USFDA approvals |
-| Metals | -1.50% | Bearish | China demand concerns |
-| Realty | -2.10% | Bearish | Interest rate sensitivity |
-| FMCG | +0.25% | Neutral | Defensive buying |
+---
 
-### News Categories
+# Key Features
 
-1. **Market-Wide** (5 articles)
-   - RBI monetary policy
-   - FII outflows
-   - Global risk-off sentiment
-   - Oil price movements
+## 1. Institutional Portfolio Analytics
 
-2. **Sector-Specific** (8 articles)
-   - US tech earnings (IT positive)
-   - China steel demand (Metals negative)
-   - Housing sales vs rate concerns (Realty mixed)
-   - Government capex push (Infra positive)
+### Computes:
 
-3. **Stock-Specific** (12 articles)
-   - HDFC Bank results (mixed)
-   - Sun Pharma USFDA approval (positive)
-   - Infosys mega deal win (positive)
-   - Tata Motors EV leadership (positive)
+* Portfolio P&L analysis
+* Sector exposure decomposition
+* Mutual fund look-through analysis
+* Diversification diagnostics
+* Herfindahl concentration (HHI)
+* Beta sensitivity estimation
+* Sector concentration risk
+* Portfolio overlap detection
+* Stress test simulations
 
-### Edge Cases for Agent Testing
+### Risk Metrics Generated
 
-The dataset includes several **conflict scenarios** to test the agent's reasoning:
+Examples:
 
-1. **Positive news + Negative price action**
-   - Bajaj Finance: Strong asset quality but stock falling due to sector sentiment
-   - HUL: Slightly up despite weak volume growth (defensive buying)
+* Diversification Score
+* Top Sector Weight
+* Concentration Risk
+* Beta Sensitivity
+* Rate Sensitivity
+* Overlap Risk
+* Drawdown Stress Scenarios
 
-2. **Mixed signals**
-   - Reliance: Strong retail but weak Jio subscriber growth
-   - Housing sales: Record high but rate concerns dominate
-   - ICICI Bank: Improved asset quality but margin compression
+---
 
-3. **Sector vs Stock divergence**
-   - Tata Motors: +0.79% vs Auto sector -1.85% (EV leadership)
+## 2. AI Advisor Report Generator
 
-## Portfolio Profiles
+Uses Groq LLM (`llama-3.1-8b-instant` / configurable) to generate:
 
-### Portfolio 1: Diversified (Rahul Sharma)
-- **Type**: Well-balanced across sectors
-- **Day P&L**: -0.44% (₹-12,785)
-- **Concentration Risk**: None
-- **Max Single Stock Weight**: 7.17% (TCS)
-- **Asset Mix**: 38% Stocks, 62% Mutual Funds
+* Executive summary
+* Market sentiment diagnosis
+* Causal driver chains
+* Material risks
+* Stress test scenarios
+* Sector intelligence view
+* Strategic rebalancing actions
+* Final portfolio diagnosis
 
-### Portfolio 2: Sector-Concentrated (Priya Patel)
-- **Type**: Banking & Financial Services heavy
-- **Day P&L**: -2.73% (₹-57,390)
-- **Concentration Risk**: CRITICAL (91.58% in Banking + FS)
-- **Max Single Stock Weight**: 22.62% (HDFC Bank)
-- **Asset Mix**: 91% Stocks, 9% Mutual Funds
+Output is structured through Pydantic schemas for consistency.
 
-### Portfolio 3: Conservative (Arun Krishnamurthy)
-- **Type**: Mutual fund heavy with defensive stocks
-- **Day P&L**: -0.04% (₹-1,758)
-- **Concentration Risk**: None
-- **Max Single Stock Weight**: 5.19% (ITC)
-- **Asset Mix**: 21% Stocks, 79% Mutual Funds (34% Debt Funds)
+---
 
-## Usage in Agent
+## 3. Causal Reasoning Engine
 
-### Loading Data
+Models financial causality:
+
+```text
+News Event
+→ Macro Variable
+→ Sector Impact
+→ Affected Holdings
+→ Portfolio P&L Impact
+```
+
+Example:
+
+```text
+Oil Shock
+→ Inflation Pressure
+→ Energy Outperforms
+→ Reliance Overweight Benefits
+→ Portfolio Positive Impact
+```
+
+Supports:
+
+* Signal prioritization
+* Conflict resolution
+* Portfolio-linked reasoning
+* Impact confidence scoring
+
+---
+
+## 4. Independent Audit / Evaluation Agent
+
+Separate LLM-based evaluator scores generated reports.
+
+### Rubric (10-point)
+
+* News Usage (4)
+* Sector Reasoning (3)
+* Portfolio Linkage (3)
+
+Penalties:
+
+* Generic reasoning
+* Missing quantified impacts
+
+Returns:
+
+* Audit Score
+* Risk Grade (A–F)
+* Critique
+* Coverage feedback
+
+This acts like a reasoning quality validator.
+
+---
+
+## 5. Streamlit Intelligence Dashboard
+
+Includes:
+
+* Portfolio selector
+* Executive risk dashboard
+* Exposure analytics charts
+* Causal reasoning tab
+* Stress testing view
+* Rebalancing recommendations
+* Audit metrics visualization
+
+Built using:
+
+* Streamlit
+* Plotly
+* Pandas
+
+---
+
+## 6. Observability
+
+Integrated with Langfuse:
+
+* LLM traces
+* Prompt observability
+* Agent monitoring
+* Run diagnostics
+
+---
+
+# Tech Stack
+
+## Backend
+
+* Python
+* FastAPI
+* Uvicorn
+* Pydantic
+* Groq API
+* Langfuse
+
+## Frontend
+
+* Streamlit
+* Plotly
+* Pandas
+
+## AI / Agent Components
+
+* Llama models via Groq
+* Prompt engineered reasoning agents
+* Evaluation agent
+* Causal signal ranking agent
+
+## Deployment
+
+* Render
+* Gunicorn
+
+---
+
+# Repository Structure
+
+```bash
+Advisor-Agent/
+│
+├── app_ui.py                     # Streamlit dashboard
+├── main.py                       # FastAPI application
+├── config.py                     # Configuration/env settings
+├── requirements.txt
+├── render.yaml
+│
+├── data/
+│   ├── portfolios.json
+│   ├── market_data.json
+│   ├── news_data.json
+│   ├── mutual_funds.json
+│   ├── sector_mapping.json
+│   └── historical_data.json
+│
+├── models/
+│   ├── portfolio.py
+│   ├── market.py
+│   ├── news.py
+│   └── schemas.py
+│
+├── services/
+│   ├── advisor_service.py
+│   ├── reasoning_service.py
+│   ├── portfolio_analytics.py
+│   ├── evaluation_service.py
+│   └── observability.py
+│
+└── utils/
+    └── data_loader.py
+```
+
+---
+
+# Core Modules Explained
+
+# 1. Data Layer (`utils/data_loader.py`)
+
+Loads and validates:
+
+* Portfolio holdings
+* Market datasets
+* News signals
+* Mutual fund data
+* Sector mappings
+* Historical data
+
+Uses Pydantic models for schema validation.
+
+Features:
+
+* Cached loading
+* JSON parsing
+* Model mapping
+* NAV fallback handling
+* Sector lookup decomposition
+
+---
+
+# 2. Portfolio Analytics Engine (`services/portfolio_analytics.py`)
+
+## Major Functions
+
+### calculate_pnl()
+
+Computes:
 
 ```python
-from data_loader import DataLoader
-
-# Initialize loader
-loader = DataLoader("./data")
-
-# Load all data
-market_data = loader.get_market_data()
-news = loader.get_news()
-portfolios = loader.get_portfolios()
-
-# Get specific portfolio
-portfolio = loader.get_portfolio("PORTFOLIO_002")
-
-# Get sector info
-sector = loader.get_sector_info("BANKING")
-
-# Get stock with news impact
-stock_analysis = loader.get_stock_with_context("HDFCBANK")
+Profit/Loss
+P&L %
 ```
 
-### Expected Agent Outputs
+---
 
-For **Portfolio 2** (Banking concentrated), the agent should identify:
+### compute_effective_sector_exposure()
 
-1. **Primary Impact**: RBI's hawkish stance hitting all banking holdings
-2. **Concentration Risk Alert**: 91.58% exposure to interest-rate sensitive sectors
-3. **Causal Chain**: 
-   ```
-   RBI Hawkish Stance → Banking Sector -2.45% → 
-   HDFC Bank -3.51% (largest holding) → Portfolio -2.73%
-   ```
-4. **Conflicting Signals**: 
-   - ICICI Bank asset quality improved but NIM compressed
-   - Bajaj Finance strong guidance but sector headwinds
+Combines:
 
-## Data Schema Reference
+* Direct stock exposure
+* Mutual fund indirect exposure
 
-### Stock Object
+Creates effective look-through sector weights.
+
+---
+
+### compute_look_through_details()
+
+Decomposes mutual funds into:
+
+* Hidden sector exposures
+* Underlying holdings
+* Overlap detection
+
+Institutional-style look-through analysis.
+
+---
+
+### Stress Tests
+
+Simulates scenarios like:
+
+* Rate hikes
+* Sector crashes
+* Market drawdowns
+
+Produces drawdown impact estimates.
+
+---
+
+# 3. Advisor Service (`advisor_service.py`)
+
+Generates structured advisor reports.
+
+## Schema Objects
+
+### CausalChain
+
+```python
+Event
+Macro Variable
+Sector Impact
+Affected Holdings
+Estimated Impact
+Confidence
+Strength
+```
+
+---
+
+### StrategicRecommendation
+
+Contains:
+
+* Current allocation
+* Target allocation
+* Allocation shift
+* Benefit
+* Trade-offs
+
+---
+
+### SectorIntelligence
+
+Provides:
+
+* Trend signal
+* Macro rationale
+* Sector impact analysis
+
+---
+
+# 4. Reasoning Service (`reasoning_service.py`)
+
+Implements agent reasoning logic.
+
+Prompts include:
+
+* Chat system prompt
+* Causal chain prompt
+* Signal prioritization prompt
+
+Supports:
+
+* Portfolio-grounded answers
+* News-driven causal chains
+* Prioritized signal ranking
+* Conflict resolution
+
+---
+
+# 5. Evaluation Service (`evaluation_service.py`)
+
+Second-agent quality validator.
+
+Returns:
+
 ```json
 {
-  "symbol": "HDFCBANK",
-  "name": "HDFC Bank Ltd",
-  "sector": "BANKING",
-  "current_price": 1542.30,
-  "change_percent": -3.51,
-  "volume": 15234500,
-  "beta": 1.15
+ score,
+ rating,
+ feedback,
+ risk_grade,
+ critique
 }
 ```
 
-### News Object
+Useful for:
+
+* Agent self-evaluation
+* Reasoning audits
+* Hallucination reduction
+
+---
+
+# API Endpoints
+
+## Root
+
+```http
+GET /
+```
+
+Returns:
+
 ```json
 {
-  "id": "NEWS001",
-  "headline": "...",
-  "sentiment": "NEGATIVE",
-  "sentiment_score": -0.72,
-  "scope": "MARKET_WIDE|SECTOR_SPECIFIC|STOCK_SPECIFIC",
-  "impact_level": "HIGH|MEDIUM|LOW",
-  "entities": {
-    "sectors": ["BANKING"],
-    "stocks": ["HDFCBANK"],
-    "indices": ["BANKNIFTY"]
-  },
-  "causal_factors": ["..."]
+ "app":"Institutional Financial Advisor",
+ "version":"0.1.7",
+ "status":"active"
 }
 ```
 
-### Portfolio Holding Object
-```json
-{
-  "symbol": "HDFCBANK",
-  "quantity": 100,
-  "avg_buy_price": 1520.00,
-  "current_price": 1542.30,
-  "weight_in_portfolio": 5.36,
-  "day_change_percent": -3.51
-}
+---
+
+## List Portfolios
+
+```http
+GET /portfolios
 ```
 
-## Extending the Dataset
+Returns all sample portfolios.
 
-To add more scenarios:
+---
 
-1. **Add New Stocks**: Update `market_data.json` → `stocks` section
-2. **Add News**: Update `news_data.json` → `news` array
-3. **Add Portfolios**: Update `portfolios.json` → `portfolios` section
-4. **Add Sector**: Update `sector_mapping.json` → `sectors` section
+## Generate Advisor Evaluation
+
+```http
+GET /api/advisor-evaluation/{portfolio_id}
+```
+
+Pipeline:
+
+1 Portfolio analytics
+
+2 Market context
+
+3 Advisor report generation
+
+4 Audit scoring
+
+Response includes:
+
+* Portfolio analysis
+* Advisor report
+* Evaluation report
+
+---
+
+# Data Models
+
+## Portfolio Model
+
+Contains:
+
+* Stocks
+* Mutual funds
+* Risk profile
+* Asset allocation
+* Risk metrics
+
+---
+
+## Market Model
+
+Includes:
+
+* Indices
+* Sector performance
+* Macro signals
+* Stock-level market data
+
+---
+
+## News Model
+
+Contains:
+
+* Sentiment
+* Impact level
+* Sector entities
+* Causal keywords
+* Relevance score
+
+---
+
+# Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/yourusername/advisor-agent.git
+cd advisor-agent
+```
+
+---
+
+## Create Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+---
+
+## Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Environment Variables
+
+Create `.env`
+
+```env
+GROQ_API_KEY=your_key
+LANGFUSE_PUBLIC_KEY=your_key
+LANGFUSE_SECRET_KEY=your_key
+LANGFUSE_HOST=https://cloud.langfuse.com
+```
+
+---
+
+# Running Backend
+
+```bash
+python main.py
+```
+
+or
+
+```bash
+uvicorn main:app --reload
+```
+
+Runs on:
+
+```bash
+http://localhost:8000
+```
+
+---
+
+# Running Streamlit UI
+
+```bash
+streamlit run app_ui.py
+```
+
+---
+
+# Deployment (Render)
+
+Included:
+
+```yaml
+render.yaml
+```
+
+Uses:
+
+* Free Render web service
+* Python runtime
+* Gunicorn/Uvicorn startup
+* Environment secret injection
+
+---
+
+# Example Workflow
+
+```text
+User selects portfolio
+↓
+Portfolio analytics engine runs
+↓
+Market + news context loaded
+↓
+LLM advisor generates report
+↓
+Evaluation agent audits report
+↓
+Dashboard shows intelligence output
+```
+
+---
+
+# Example Use Cases
+
+## Portfolio Risk Copilot
+
+Analyze concentrated portfolios.
+
+---
+
+## Wealth Advisory Intelligence
+
+Generate CIO-style portfolio diagnostics.
+
+---
+
+## Multi-Agent Financial Reasoning Research
+
+Experiment with:
+
+* Agentic finance systems
+* Causal reasoning pipelines
+* Self-evaluating agents
+
+---
+
+## Educational / Demonstration Platform
+
+Demonstrates:
+
+* Agent architecture
+* Financial AI reasoning
+* LLM structured outputs
+
+---
+
+# Project Highlights
+
+## Institutional Concepts Implemented
+
+✅ Look-through fund decomposition
+✅ HHI concentration analysis
+✅ Stress testing
+✅ Sector risk diagnostics
+✅ Causal market reasoning
+✅ Independent evaluator agent
+✅ Rebalancing intelligence
+✅ Observability tracing
+
+---
+
+# Novel Aspects of the Project
+
+What makes this stronger than a standard chatbot project:
+
+## Not just Q&A
+
+It combines:
+
+* Quant models
+* LLM reasoning
+* Audit layer
+* Decision support
+
+---
+
+## Multi-Agent Design
+
+Distinct agent roles:
+
+* Analyst agent
+* Advisor agent
+* Evaluator agent
+
+This resembles practical agent orchestration.
+
+---
+
+## Structured Reasoning Outputs
+
+Not plain text generation.
+
+Produces typed financial intelligence objects.
+
+---
+
+# Potential Future Improvements
+
+Possible extensions:
+
+* Real-time market APIs
+* RAG over financial research
+* Vector memory for portfolio history
+* Scenario Monte Carlo simulation
+* Multi-LLM routing
+* Autonomous trade policy engine
+* Live broker integrations
+* Fine-tuned financial reasoning model
+
+---
+
+# Sample Screens / Modules
+
+Dashboard sections:
+
+```text
+Executive Summary
+Exposure Analytics
+Causal Reasoning
+Risk & Stress
+Rebalancing
+Audit Score
+```
+
+---
+
+# Requirements
+
+```text
+fastapi
+uvicorn
+pydantic
+python-dotenv
+groq
+langfuse
+streamlit
+plotly
+pandas
+requests
+gunicorn
+```
+
+---
+
+# Performance Notes
+
+Includes:
+
+* Latency tracking
+* Confidence levels
+* Fallback defaults
+* Exception handling
+* Safe observability flush
+* Compatibility response formatting
+
+---
+
+# Why This Project Matters
+
+This project sits at intersection of:
+
+* Agentic AI
+* Quant Finance
+* Explainable Reasoning
+* Portfolio Intelligence
+* Autonomous Decision Support
+
+It goes beyond traditional CRUD finance dashboards and moves toward **autonomous financial research agents**.
+
+---
+
+# Authoring Concepts Demonstrated
+
+This project demonstrates understanding of:
+
+* FastAPI system design
+* Pydantic modeling
+* Agent orchestration
+* Prompt engineering
+* Financial analytics
+* Explainable AI reasoning
+* Evaluation pipelines
+* Observability tooling
+* Full-stack deployment
+
+---
+
+# License
+
+MIT License
+
+---
+
+# Acknowledgements
+
+Built with:
+
+* Groq
+* FastAPI
+* Streamlit
+* Plotly
+* Langfuse
+* Pydantic
+
+---
+
+## One-Line Summary
+
+**An autonomous multi-agent financial intelligence platform that performs portfolio analytics, causal reasoning, risk diagnostics, and self-audited investment recommendations through FastAPI + Streamlit + LLM agents.**
