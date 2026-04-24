@@ -8,7 +8,7 @@ import json
 
 import os
 
-# --- Configuration ---
+
 API_BASE_URL = os.getenv("API_BASE_URL", "https://advisor-agent-backend-10r2.onrender.com")
 st.set_page_config(
     page_title="Portfolio Intelligence",
@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- Custom CSS for Institutional Look ---
+
 st.markdown("""
     <style>
     .main {
@@ -52,7 +52,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Helper Functions ---
 def fetch_portfolios():
     try:
         response = requests.get(f"{API_BASE_URL}/portfolios")
@@ -64,7 +63,7 @@ def fetch_analysis(portfolio_id):
     response = requests.get(f"{API_BASE_URL}/api/advisor-evaluation/{portfolio_id}")
     return response.json()
 
-# --- Sidebar ---
+
 st.sidebar.title("PortFolio Risk Advisor")
 st.sidebar.markdown("---")
 
@@ -82,7 +81,7 @@ if st.sidebar.button("Generate Intelligence Report"):
         st.session_state.report_data = fetch_analysis(portfolio_id)
         st.session_state.last_id = portfolio_id
 
-# --- Main Dashboard ---
+
 if "report_data" not in st.session_state or st.session_state.last_id != portfolio_id:
     st.title("Portfolio Intelligence Terminal")
     st.info("Select a portfolio and click 'Generate Intelligence Report' to begin analysis.")
@@ -92,7 +91,7 @@ else:
     analysis = data["portfolio_analysis"]
     eval_audit = data["evaluation"]
 
-    # 1. Executive Portfolio Snapshot
+
     st.markdown(f"# Intelligence Report: {selected_p_name}")
     
     col1, col2, col3, col4, col5 = st.columns(5)
@@ -114,7 +113,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # 2. Effective Exposure & Look-Through
+
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Exposure Analytics", "⛓️ Causal Reasoning", "⚠️ Risk & Stress", "🔄 Rebalancing"])
 
     with tab1:
@@ -193,7 +192,7 @@ else:
         else:
             st.success("No urgent rebalancing required based on current causal signals.")
 
-    # 8. Reasoning Confidence & Audit
+
     st.markdown("---")
     st.subheader("Reasoning Audit & Evidence Coverage")
     a1, a2, a3 = st.columns(3)
@@ -208,7 +207,7 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # Chat Interface at the bottom
+
     st.markdown("---")
     st.subheader("💬 Ask Advisor Anything")
     if "messages" not in st.session_state:
