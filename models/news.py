@@ -14,9 +14,9 @@ class NewsArticle(BaseModel):
     headline: str
     summary: str
     source: str
-    sentiment: str  # BULLISH | BEARISH | NEUTRAL
-    impact_level: str  # HIGH | MEDIUM | LOW
-    scope: str = "MARKET"  # MARKET | SECTOR | STOCK
+    sentiment: str  
+    impact_level: str  
+    scope: str = "MARKET"  
     entities: NewsEntities = Field(default_factory=NewsEntities)
     relevance_score: float = 0.5
     causal_keywords: List[str] = []
