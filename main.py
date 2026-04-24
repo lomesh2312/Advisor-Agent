@@ -45,6 +45,17 @@ async def log_requests(request: Request, call_next):
 async def root():
     return {"app": "Institutional Financial Advisor", "version": "0.1.7", "status": "active"}
 
+@app.get("/portfolios")
+async def get_portfolios():
+    """Returns a list of all portfolios for the dashboard."""
+    portfolios = data_loader.get_portfolios()
+    return {
+        "portfolios": [
+            {"portfolio_id": p.id, "user_name": p.user_name}
+            for p in portfolios.values()
+        ]
+    }
+
 @app.get("/api/advisor-evaluation/{portfolio_id}")
 async def get_advisor_evaluation(portfolio_id: str):
     logger.info(f"Processing institutional evaluation for portfolio: {portfolio_id}")
