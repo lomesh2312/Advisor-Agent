@@ -11,7 +11,7 @@ import os
 # --- Configuration ---
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 st.set_page_config(
-    page_title="Antigravity | Portfolio Intelligence",
+    page_title="Portfolio Intelligence",
     page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -65,7 +65,7 @@ def fetch_analysis(portfolio_id):
     return response.json()
 
 # --- Sidebar ---
-st.sidebar.title("🎯 Antigravity PM")
+st.sidebar.title("PortFolio Risk Advisor")
 st.sidebar.markdown("---")
 
 portfolios = fetch_portfolios()
