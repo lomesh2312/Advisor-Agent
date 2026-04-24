@@ -26,7 +26,6 @@ class DataLoader:
         self._historical_data: Optional[Dict] = None
         self._load_all()
 
-    # ─── Internal Loaders ──────────────────────────────────────────────────────
 
     def _load_json(self, filename: str) -> Optional[Dict]:
         path = DATA_DIR / filename
@@ -55,20 +54,20 @@ class DataLoader:
             return
         for pid, p in raw.get("portfolios", {}).items():
             try:
-                # Parse stocks
+
                 stocks = [StockHolding(**s) for s in p["holdings"].get("stocks", [])]
 
-                # Parse mutual funds (some have current_price instead of current_nav)
+
                 mf_list = []
                 for mf in p["holdings"].get("mutual_funds", []):
-                    # Ensure current_nav is populated (fallback to current_price)
+
                     if "current_nav" not in mf or mf["current_nav"] is None:
                         mf["current_nav"] = mf.get("current_price", mf.get("avg_nav"))
                     mf_list.append(MutualFundHolding(**mf))
 
                 holdings = Holdings(stocks=stocks, mutual_funds=mf_list)
 
-                # Risk metrics
+
                 rm_raw = p["analytics"]["risk_metrics"]
                 risk_metrics = RiskMetrics(
                     concentration_risk=rm_raw.get("concentration_risk", False),
@@ -79,7 +78,7 @@ class DataLoader:
                     concentration_warning=rm_raw.get("concentration_warning"),
                 )
 
-                # Day summary
+
                 ds_raw = p["analytics"]["day_summary"]
                 day_summary = DaySummary(
                     day_change_absolute=ds_raw.get("day_change_absolute", 0.0),
@@ -124,10 +123,10 @@ class DataLoader:
                 date=meta_raw["date"],
                 market_status=meta_raw["market_status"],
                 currency=meta_raw["currency"],
-                sentiment="BEARISH",  # derived from indices below
+                sentiment="BEARISH",  
             )
 
-            # Indices — JSON has extra keys like 52_week_high we skip via model
+
             indices: Dict[str, Index] = {}
             for k, v in raw.get("indices", {}).items():
                 try:
@@ -144,7 +143,7 @@ class DataLoader:
                 except Exception as e:
                     logger.warning(f"Skipping index {k}: {e}")
 
-            # Derive market sentiment from NIFTY50 + SENSEX
+
             nifty = indices.get("NIFTY50")
             sensex = indices.get("SENSEX")
             if nifty and sensex:
@@ -155,7 +154,7 @@ class DataLoader:
                 else:
                     metadata.sentiment = "NEUTRAL"
 
-            # Sector performance
+
             sector_perf: Dict[str, SectorPerformance] = {}
             for k, v in raw.get("sector_performance", {}).items():
                 try:
@@ -169,7 +168,7 @@ class DataLoader:
                 except Exception as e:
                     logger.warning(f"Skipping sector {k}: {e}")
 
-            # Stocks — JSON has 52_week_high/low which we map to week_52_high/low
+
             stocks: Dict[str, Stock] = {}
             for symbol, v in raw.get("stocks", {}).items():
                 try:
@@ -214,9 +213,9 @@ class DataLoader:
                     stocks=ent_raw.get("stocks", []),
                     macro_variables=ent_raw.get("keywords", []),
                 )
-                # Map JSON fields to model fields
+
                 sentiment_raw = article.get("sentiment", "NEUTRAL")
-                # Normalize: POSITIVE->BULLISH, NEGATIVE->BEARISH, MIXED->NEUTRAL
+
                 sentiment_map = {
                     "POSITIVE": "BULLISH",
                     "NEGATIVE": "BEARISH",
@@ -253,7 +252,7 @@ class DataLoader:
     def _load_historical_data(self):
         self._historical_data = self._load_json("historical_data.json")
 
-    # ─── Public API ────────────────────────────────────────────────────────────
+
 
     def get_portfolios(self) -> Dict[str, Portfolio]:
         return self._portfolios
@@ -341,7 +340,7 @@ class DataLoader:
 
         relevant = []
         seen = set()
-        # First pass: stock-specific news
+
         for article in self._news:
             if article.id in seen:
                 continue
@@ -349,7 +348,7 @@ class DataLoader:
                 relevant.append(article)
                 seen.add(article.id)
 
-        # Second pass: sector news
+
         for article in self._news:
             if article.id in seen:
                 continue
@@ -357,7 +356,7 @@ class DataLoader:
                 relevant.append(article)
                 seen.add(article.id)
 
-        # Third pass: market-wide high impact
+
         for article in self._news:
             if article.id in seen:
                 continue
