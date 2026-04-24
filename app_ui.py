@@ -6,8 +6,10 @@ import plotly.graph_objects as go
 from datetime import datetime
 import json
 
+import os
+
 # --- Configuration ---
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 st.set_page_config(
     page_title="Antigravity | Portfolio Intelligence",
     page_icon="🎯",
