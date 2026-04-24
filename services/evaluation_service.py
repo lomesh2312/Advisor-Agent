@@ -20,11 +20,12 @@ class EvaluationResult(BaseModel):
     sector_reasoning_score: float
     portfolio_linkage_score: float
     penalties_applied: float
+    risk_grade: str = "B"
 
 EVALUATION_SYSTEM_PROMPT = """You are a Senior Portfolio Auditor. Evaluate report on 10-point rubric.
 SCORING (10): NEWS(4), SECTOR(3), PORTFOLIO LINKAGE(3).
 PENALTIES: GENERIC LANGUAGE(-1), MISSING %(-1).
-Return JSON: {"score":float,"rating":"HIGH|GOOD|MEDIUM|LOW","feedback":"string","news_usage_score":float,"sector_reasoning_score":float,"portfolio_linkage_score":float,"penalties_applied":float}"""
+Return JSON: {"score":float,"rating":"HIGH|GOOD|MEDIUM|LOW","feedback":"string","news_usage_score":float,"sector_reasoning_score":float,"portfolio_linkage_score":float,"penalties_applied":float,"risk_grade":"A|B|C|D|F"}"""
 
 def evaluate_advisor_report(report: Any) -> EvaluationResult:
     try:
@@ -47,4 +48,4 @@ def evaluate_advisor_report(report: Any) -> EvaluationResult:
     except Exception as e:
         logger.error(f"Evaluator Error: {e}")
         safe_flush()
-        return EvaluationResult(score=0.0, rating="LOW", feedback=str(e), news_usage_score=0, sector_reasoning_score=0, portfolio_linkage_score=0, penalties_applied=0)
+        return EvaluationResult(score=0.0, rating="LOW", feedback=str(e), news_usage_score=0, sector_reasoning_score=0, portfolio_linkage_score=0, penalties_applied=0, risk_grade="C")
