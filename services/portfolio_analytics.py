@@ -26,6 +26,13 @@ class MajorHolding(BaseModel):
     name: str
     weight: float
 
+class LookThroughResult(BaseModel):
+    fund_name: str
+    fund_weight: float
+    decomposed_sectors: Dict[str, float]
+    top_holdings: List[str]
+    overlap_detected: bool = False
+
 class PortfolioAnalysis(BaseModel):
     portfolio_id: str
     total_pnl: float
@@ -36,6 +43,7 @@ class PortfolioAnalysis(BaseModel):
     stress_tests: List[StressTest]
     major_holdings: List[MajorHolding]
     total_current_value: float
+    look_through_details: List[LookThroughResult]
 
 def get_current_nav(mf: MutualFundHolding) -> float:
     nav = mf.current_nav if mf.current_nav is not None else mf.current_price
@@ -91,6 +99,39 @@ def compute_effective_sector_exposure(portfolio: Portfolio, data_loader: DataLoa
 
     exposure = {sector: round((val / total_current_value) * 100, 2) for sector, val in effective_sectors.items()}
     return dict(sorted(exposure.items(), key=lambda x: x[1], reverse=True))
+
+def compute_look_through_details(portfolio: Portfolio, data_loader: DataLoader) -> List[LookThroughResult]:
+    look_through = []
+    total_val = get_total_current_value(portfolio)
+    if total_val == 0: return []
+
+    symbol_to_sector = {}
+    mapping_obj = data_loader.get_sector_mapping()
+    if mapping_obj and hasattr(mapping_obj, 'sectors'):
+        for sector_name, sector_data in mapping_obj.sectors.items():
+            if hasattr(sector_data, 'stocks'):
+                for symbol in sector_data.stocks:
+                    symbol_to_sector[symbol] = sector_name
+
+    for mf in portfolio.holdings.mutual_funds:
+        mf_val = get_current_nav(mf) * mf.units
+        weight = round((mf_val / total_val) * 100, 2)
+        
+        sectors = {}
+        holdings = mf.top_holdings or []
+        if holdings:
+            per_holding = 100.0 / len(holdings)
+            for s in holdings:
+                sec = symbol_to_sector.get(s, "OTHER").upper()
+                sectors[sec] = sectors.get(sec, 0.0) + per_holding
+        
+        look_through.append(LookThroughResult(
+            fund_name=mf.scheme_name,
+            fund_weight=weight,
+            decomposed_sectors={k: round(v, 2) for k, v in sectors.items()},
+            top_holdings=holdings[:5]
+        ))
+    return look_through
 
 def calculate_hhi(effective_exposure: Dict[str, float]) -> float:
     # HHI = sum of squared market shares
@@ -160,5 +201,6 @@ def build_portfolio_analysis(portfolio: Portfolio, data_loader: DataLoader) -> P
         risk_diagnostics=risk_diagnostics,
         stress_tests=run_stress_tests(effective_exposure),
         major_holdings=major_holdings[:5],
-        total_current_value=total_val
+        total_current_value=total_val,
+        look_through_details=compute_look_through_details(portfolio, data_loader)
     )
