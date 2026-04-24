@@ -39,6 +39,7 @@ class SectorIntelligence(BaseModel):
 
 class AdvisorReport(BaseModel):
     portfolio_id: str
+    run_id: str = "RUN-001"
     executive_summary: str = "Generating report..."
     market_sentiment: str = "NEUTRAL"
     effective_sector_exposure: Dict[str, float] = {}
@@ -104,7 +105,9 @@ def generate_advisor_report(market_context: Dict[str, Any], portfolio_analysis: 
         latency = (time.time() - start_time) * 1000
         data = json.loads(completion.choices[0].message.content)
         
-        # Robustness: Sync some fields from analysis if missing/hallucinated
+        import uuid
+        run_id = f"RUN-{str(uuid.uuid4())[:8].upper()}"
+        data["run_id"] = run_id
         data["portfolio_id"] = portfolio_id
         data["effective_sector_exposure"] = portfolio_analysis.get("effective_sector_exposure", {})
         data["market_sentiment"] = data.get("market_sentiment") or market_context.get("market_sentiment", "NEUTRAL")
