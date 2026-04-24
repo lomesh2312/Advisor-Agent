@@ -9,7 +9,7 @@ import json
 import os
 
 # --- Configuration ---
-API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://advisor-agent-backend-10r2.onrender.com")
 st.set_page_config(
     page_title="Portfolio Intelligence",
     page_icon="🎯",
