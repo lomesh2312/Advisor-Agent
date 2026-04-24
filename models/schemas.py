@@ -1,9 +1,6 @@
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
-
-# ─── Schemas used in API responses ────────────────────────────────────────────
-
 class PortfolioSummary(BaseModel):
     portfolio_id: str
     user_name: str
@@ -64,7 +61,6 @@ class PortfolioAnalysisResult(BaseModel):
     total_current_value: float
 
 
-# ─── Reasoning / Causal Chain Schemas ─────────────────────────────────────────
 
 class CausalChain(BaseModel):
     event: str
@@ -73,7 +69,7 @@ class CausalChain(BaseModel):
     affected_holdings: str
     estimated_portfolio_impact: float
     confidence: float
-    strength: str = "MEDIUM"  # WEAK | MEDIUM | STRONG
+    strength: str = "MEDIUM"  
 
 
 class ConflictResolution(BaseModel):
@@ -105,7 +101,6 @@ class ReasoningChain(BaseModel):
     latency_ms: float
 
 
-# ─── Advisor Report ────────────────────────────────────────────────────────────
 
 class StrategicRecommendation(BaseModel):
     action: str
@@ -142,12 +137,11 @@ class AdvisorReport(BaseModel):
     latency_ms: float = 0.0
 
 
-# ─── Evaluation Schema ─────────────────────────────────────────────────────────
 
 class EvaluationResult(BaseModel):
     run_id: str = ""
     score: float
-    rating: str  # HIGH | GOOD | MEDIUM | LOW
+    rating: str  
     feedback: str
     news_usage_score: float
     sector_reasoning_score: float
@@ -158,7 +152,6 @@ class EvaluationResult(BaseModel):
     critique: str = ""
 
 
-# ─── Chat / Agent ─────────────────────────────────────────────────────────────
 
 class ChatRequest(BaseModel):
     query: str
@@ -178,7 +171,6 @@ class ChatResponse(BaseModel):
     latency_ms: float = 0.0
 
 
-# ─── Market Intelligence Schemas ──────────────────────────────────────────────
 
 class SectorTrendResponse(BaseModel):
     sector: str
@@ -199,7 +191,6 @@ class MacroSignalResponse(BaseModel):
     interpretation: str
 
 
-# ─── News Intelligence ────────────────────────────────────────────────────────
 
 class NewsClassifyRequest(BaseModel):
     headline: str
@@ -228,7 +219,6 @@ class CausalImpactResponse(BaseModel):
     high_impact_signals: List[str]
 
 
-# ─── Observability ────────────────────────────────────────────────────────────
 
 class TraceInfo(BaseModel):
     run_id: str
