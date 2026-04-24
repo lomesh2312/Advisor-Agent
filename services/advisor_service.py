@@ -119,7 +119,7 @@ def generate_advisor_report(market_context: Dict[str, Any], portfolio_analysis: 
     except Exception as e:
         logger.error(f"Institutional Advisor Error: {e}")
         safe_flush()
-        # Return a fallback report instead of crashing
+
         return AdvisorReport(
             portfolio_id=portfolio_id,
             executive_summary=f"Analysis engine experienced a transient error. Manual look-through suggests concentration in {portfolio_analysis.get('top_sector', 'equity')}.",
