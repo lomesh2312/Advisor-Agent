@@ -41,7 +41,6 @@ class ReasoningService:
         self.data_loader = data_loader
         self._client = Groq(api_key=GROQ_API_KEY)
 
-    # ─── Chat ──────────────────────────────────────────────────────────────────
 
     def chat(self, request: ChatRequest) -> ChatResponse:
         session_id = request.session_id or str(uuid.uuid4())[:8]
@@ -87,7 +86,6 @@ class ReasoningService:
             }
             context_parts.append(f"MARKET DATA:\n{json.dumps(mkt_summary)}")
 
-        # Relevant news
         if portfolio:
             news = self.data_loader.get_news_relevant_to_portfolio(portfolio, limit=6)
         else:
@@ -133,7 +131,6 @@ class ReasoningService:
             latency_ms=latency_ms,
         )
 
-    # ─── Causal Chain Builder ─────────────────────────────────────────────────
 
     def build_causal_chains(
         self,
@@ -178,7 +175,7 @@ class ReasoningService:
                 max_tokens=1500,
             )
             raw = json.loads(completion.choices[0].message.content)
-            # LLM may return dict with key or direct array
+
             chains_raw = raw if isinstance(raw, list) else raw.get("chains", raw.get("causal_chains", []))
             chains = []
             for c in chains_raw:
@@ -191,7 +188,6 @@ class ReasoningService:
             logger.error(f"Causal chain error: {e}")
             return []
 
-    # ─── Signal Prioritizer ───────────────────────────────────────────────────
 
     def prioritize_signals(
         self,
@@ -243,15 +239,13 @@ class ReasoningService:
             logger.error(f"Signal prioritizer error: {e}")
             return []
 
-    # ─── Conflict Resolution ──────────────────────────────────────────────────
-
     def resolve_conflicts(self, news_list: List[NewsArticle]) -> List[ConflictResolution]:
         """Detects news with conflict_flag and resolves positive news + negative price cases."""
         conflicts = []
         for n in news_list:
-            # Detect conflicts: positive news but sectors are bearish
+
             if n.sentiment == "BULLISH" and n.impact_level == "HIGH":
-                # Check if sectors are bearish in market data
+
                 conflicts.append(ConflictResolution(
                     signal_a=f"{n.id}: {n.headline[:60]}",
                     signal_b="Market-wide selling pressure (FII outflows, risk-off)",
